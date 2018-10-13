@@ -1,4 +1,4 @@
-export image_prename ?= tv
+export image_prename ?= p
 export KEY ?= "70D2060738BEF80523ACAFF7D75C03B39B5E14E1"
 
 #export proxy_host = $(shell hoardercache-detect-proxy | sed 's|:3142/||g' | sed 's|:3143/||g' | sed 's|http://||g' | tr -d '\n\t ')

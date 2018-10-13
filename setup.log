@@ -1,0 +1,5 @@
+make[2]: Entering directory '/home/idk/local-manifest/distro-site-manifest/personalos-static'
+docker build --force-rm \
+	--build-arg "CACHING_PROXY"="" \
+	-t eyedeekay/p-build-devuan \
+	-f Dockerfiles/Dockerfile.live-build.devuan .
