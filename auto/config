@@ -15,6 +15,10 @@ fi
 
 export dsusekeyring="--keyring=/usr/share/keyrings/$distro-archive-keyring.gpg"
 
+echo USING:
+ls /usr/share/keyrings/$distro-archive-keyring.gpg
+sleep 45
+
 export initsystem="sysvinit"
 
 if [ "$persistence" == "yes" ]; then
@@ -46,7 +50,7 @@ if [ "$distro" = "debian" ]; then
 elif [ "$distro" = "devuan" ]; then
         export mirror="$mirror_devuan"
         export mirror_packages="$mirror_devuan"
-        export unstable="jessie"
+        export unstable="ceres"
         export stable="jessie"
         export aptpkg="aptitude"
         export bootstrapopts="--merged-usr     $dsusekeyring       --variant=minbase       --include=busybox-syslogd,gnupg2,apt-utils,apt-transport-https,ca-certificates,devuan-keyring               --exclude=systemd  $components"
