@@ -1,0 +1,15 @@
+#! /usr/bin/env bash
+
+set -e
+
+lb clean noauto #"$@"
+
+rm -rf *.hybrid.iso \
+	*.hybrid.iso.sha256sum \
+	*.hybrid.iso.sha256sum.asc \
+	*.files \
+	*.contents \
+	*.hybrid.iso.zsync \
+	*.packages \
+        *log \
+        *err

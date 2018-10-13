@@ -1,0 +1,7 @@
+	#! /bin/sh
+	dockerd-entrypoint &
+	sleep 20
+	git clone https://github.com/eyedeekay/playdeb.git
+	cd playdeb; make install
+	rm -rf playdeb
+	killall dockerd-entrypoint

@@ -1,0 +1,7 @@
+	#! /bin/sh
+	dockerd-entrypoint &
+	sleep 20
+	docker pull debian:sid
+	docker pull debitux/devuan:unstable
+	docker pull alpine:3.6
+	killall dockerd-entrypoint

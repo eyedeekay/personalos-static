@@ -1,0 +1,155 @@
+#! /usr/bin/env bash
+
+make get-keys 1> /dev/null
+make import-keys 1> /dev/null
+make export-keys 1> /dev/null
+
+if [ -f keyrings/repokeys.gpg ]; then
+        gpg --no-default-keyring --keyring repokeys.gpg --import keyrings/repokeys.gpg
+fi
+
+
+if [ -f auto/common ]; then
+        . auto/common
+fi
+
+export dsusekeyring="--keyring=$HOME/.gnupg/repokeys.gpg"
+
+export initsystem="sysvinit"
+
+if [ "$persistence" == "yes" ]; then
+    export bootappend="--bootappend-live 'boot=live components persistence persistence-encryption=luks'"
+    export persist="-persistence"
+fi
+
+if [ "$custom" = "yes" ]; then
+        export customized="-custom"
+fi
+
+if [ ! -z "$proxy_addr" ]; then
+        export useproxy="--apt-http-proxy $proxy_addr"
+fi
+
+if [ "$distro" = "debian" ]; then
+        export mirror="$mirror_debian"
+        export mirror_packages="$mirror_debian"
+        export unstable="sid"
+        export stable="sid"
+        export aptpkg="aptitude"
+        export bootstrapopts="--merged-usr     $dsusekeyring       --variant=minbase       --include=busybox-syslogd,gnupg2,apt-utils,apt-transport-https,ca-certificates,debian-archive-keyring     --exclude=systemd,systemd-sysv,sysv-rc   $components"
+        export usekeyring="--keyring-packages debian-archive-keyring"
+        export distromode="--mode debian"
+        export useupdates="--updates false"
+        export debootstrap_opts_supported="--debootstrap-options"
+        export image_name="$image_prename$customized$persist-$distro"
+        export image_name_supported="--image-name"
+elif [ "$distro" = "devuan" ]; then
+        export mirror="$mirror_devuan"
+        export mirror_packages="$mirror_devuan"
+        export unstable="jessie"
+        export stable="jessie"
+        export aptpkg="aptitude"
+        export bootstrapopts="--merged-usr     $dsusekeyring       --variant=minbase       --include=busybox-syslogd,gnupg2,apt-utils,apt-transport-https,ca-certificates,devuan-keyring               --exclude=systemd  $components"
+        export usekeyring="--keyring-packages devuan-keyring"
+        export distromode="--mode debian"
+        export useupdates="--updates false"
+        export debootstrap_opts_supported="--debootstrap-options"
+        export image_name="$image_prename$customized$persist-$distro"
+        export image_name_supported="--image-name"
+fi
+
+if [ ! -z "$components" ]; then
+        echo "WARNING: USING NON-FREE COMPONENTS! $components"
+        echo "$archiveareas"
+fi
+
+echo "#! /usr/bin/env bash"
+echo "# settings check:"
+echo "export mirror=\"$mirror\"" | tee auto/common
+echo "export mirror_packages=\"$mirror_packages\"" | tee -a auto/common
+echo "export aptpkg=\"$aptpkg\"" | tee -a auto/common
+echo "export unstable=\"$unstable\"" | tee -a auto/common
+echo "export stable=\"$stable\"" | tee -a auto/common
+echo "export components='$components'" | tee -a auto/common
+echo "export nosource=\"$nosource\"" | tee -a auto/common
+echo "export archiveareas=\"$archiveareas\"" | tee -a auto/common
+echo "export useupdates=\"$useupdates\"" | tee -a auto/common
+echo "export debootstrap_opts_supported=\"$debootstrap_opts_supported\"" | tee -a auto/common
+echo "#export bootappend='$bootappend'" | tee -a auto/common
+echo "export persistence=\"$persistence\"" | tee -a auto/common
+echo "export persist=\"$persist\"" | tee -a auto/common
+echo "export image_name=\"$image_name\"" | tee -a auto/common
+echo "export image_name_supported=\"$image_name_supported\"" | tee -a auto/common
+echo "export bootstrapopts=\"$bootstrapopts\"" | tee -a auto/common
+echo "export usekeyring=\"$usekeyring\"" | tee -a auto/common
+echo "export distromode=\"$distromode\"" | tee -a auto/common
+echo "export dsusekeyring=\"$dsusekeyring\"" | tee -a auto/common
+echo "export proxy_addr=\"$proxy_addr\"" | tee -a auto/common
+echo "export useproxy=\"$useproxy\"" | tee -a auto/common
+echo "export custom=\"$custom\"" | tee -a auto/common
+echo "export customized=\"$customized\"" | tee -a auto/common
+
+lb config noauto \
+    --apt $aptpkg \
+    --apt-recommends true \
+    --apt-options "--assume-yes" \
+    $useproxy \
+    --binary-images iso-hybrid \
+    --quiet \
+    --cache true \
+    $useupdates \
+    --security false \
+    --cache-indices true \
+    --cache-packages true \
+    --debconf-frontend noninteractive \
+    --distribution "$unstable" \
+    --parent-distribution "$stable" \
+    $debootstrap_opts_supported "$bootstrapopts" \
+    $bootappend \
+    --bootloader syslinux \
+    --firmware-chroot true \
+    --firmware-binary true \
+    $usekeyring \
+    --initsystem "$initsystem" \
+    $archiveareas \
+    $nosource \
+    $distromode \
+    $image_name_supported "$image_name" \
+    --parent-mirror-bootstrap "$mirror" \
+    --parent-mirror-chroot "$mirror" \
+    --parent-mirror-chroot-security "$mirror" \
+    --parent-mirror-binary "$mirror" \
+    --parent-mirror-binary-security "$mirror" \
+    --parent-mirror-debian-installer "$mirror" \
+    --mirror-bootstrap "$mirror" \
+    --mirror-chroot "$mirror" \
+    --mirror-chroot-security "$mirror" \
+    --mirror-binary "$mirror" \
+    --mirror-binary-security "$mirror" \
+    --parent-mirror-debian-installer "$mirror" \
+    --debian-installer live \
+    --system live > >(tee -a config.log) 2> >(tee -a config.err >&2)
+
+
+make libre 1> /dev/null
+
+if [ "$distro" = "devuan" ]; then
+        echo "creating devuan keyring" > >(tee -a config.log) 2> >(tee -a config.err >&2)
+        make devuan-key 1> /dev/null
+fi
+
+echo "Creating user defaults" > >(tee -a config.log) 2> >(tee -a config.err >&2)
+make easy-user 1> /dev/null
+
+if [ "$custom" = "yes" ]; then
+        echo "Creating customizations" > >(tee -a config.log) 2> >(tee -a config.err >&2)
+        make custom 1> /dev/null
+fi
+
+make skel 1> /dev/null
+make packages 1> /dev/null
+make hooks 1> /dev/null
+
+echo "Done donfiguring $distro distro" > >(tee -a config.log) 2> >(tee -a config.err >&2)
+
+find ./config -empty -delete
