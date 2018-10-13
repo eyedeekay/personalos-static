@@ -1,4 +1,4 @@
-FROM debitux/devuan:unstable
+FROM vpgrp/devuan:unstable
 ARG DEBIAN_FRONTEND="noninteractive"
 ARG LANG="C.UTF-8"
 ARG LC_ALL="C.UTF-8"
