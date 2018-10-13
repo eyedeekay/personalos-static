@@ -1,4 +1,4 @@
-FROM vpgrp/devuan:unstable
+FROM vpgrp/devuan:ascii
 ARG DEBIAN_FRONTEND="noninteractive"
 ARG LANG="C.UTF-8"
 ARG LC_ALL="C.UTF-8"
