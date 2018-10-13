@@ -136,7 +136,7 @@ get-keys:
 import-keys:
 	gpg --keyserver $(keyserver) --no-default-keyring --keyring repokeys.gpg --import keyrings/*.gpg
 	gpg --keyserver $(keyserver) --no-default-keyring --keyring repokeys.gpg --import keyrings/*.asc
-	gpg --keyserver $(keyserver) --no-default-keyring --keyring repokeys.gpg --import /usr/share/keyrings/*-archive-keyring.gpg
+	gpg --keyserver $(keyserver) --no-default-keyring --keyring repokeys.gpg --import /usr/share/keyrings/$(distro)-archive-keyring.gpg
 	true
 
 export-keys:
