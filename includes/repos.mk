@@ -124,6 +124,7 @@ tox-repo:
 		&& ln -sf tox.list.key.chroot tox.list.key.binary
 
 get-keys:
+	gpg --full-generate-key
 	gpg --keyserver $(keyserver) --no-default-keyring --keyring repokeys.gpg --recv-keys 94532124541922FB
 	yes | gpg --keyserver $(keyserver) --no-default-keyring --keyring repokeys.gpg  --armor --export 94532124541922FB > keyrings/devuan.asc
 	yes | gpg --keyserver $(keyserver) --no-default-keyring --keyring repokeys.gpg  --export 94532124541922FB > keyrings/devuan.gpg
@@ -131,7 +132,7 @@ get-keys:
 	yes | gpg --keyserver $(keyserver) --no-default-keyring --keyring repokeys.gpg --armor --export 7638D0442B90D010 > keyrings/debian.asc
 	yes | gpg --keyserver $(keyserver) --no-default-keyring --keyring repokeys.gpg  --export 7638D0442B90D010 > keyrings/debian.gpg
 	apt-key exportall | tee keyrings/local.asc; \
-	cp /usr/share/keyrings/*-archive-keyring.gpg keyrings
+	cp /usr/share/keyrings/$(distro)-archive-keyring.gpg keyrings
 
 import-keys:
 	gpg --keyserver $(keyserver) --no-default-keyring --keyring repokeys.gpg --import keyrings/*.gpg

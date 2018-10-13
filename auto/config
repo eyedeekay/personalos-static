@@ -13,11 +13,7 @@ if [ -f auto/common ]; then
         . auto/common
 fi
 
-export dsusekeyring="--keyring=/usr/share/keyrings/$distro-archive-keyring.gpg"
-
-echo USING:
-ls /usr/share/keyrings/$distro-archive-keyring.gpg
-sleep 45
+export dsusekeyring="--keyring=./keyrings/repokeys.gpg"
 
 export initsystem="sysvinit"
 
