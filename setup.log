@@ -1,5 +1,118 @@
 make[2]: Entering directory '/home/idk/local-manifest/distro-site-manifest/personalos-static'
 docker build --force-rm \
 	--build-arg "CACHING_PROXY"="" \
-	-t eyedeekay/p-build-devuan \
+	-t eyedeekay/build-devuan \
 	-f Dockerfiles/Dockerfile.live-build.devuan .
+Sending build context to Docker daemon 2.059 MB
+Step 1/16 : FROM debitux/devuan:unstable
+ ---> ee1fb5b9f45d
+Step 2/16 : ARG DEBIAN_FRONTEND="noninteractive"
+ ---> Using cache
+ ---> b90919da374b
+Step 3/16 : ARG LANG="C.UTF-8"
+ ---> Using cache
+ ---> c057de34c756
+Step 4/16 : ARG LC_ALL="C.UTF-8"
+ ---> Using cache
+ ---> ebc8dff375a1
+Step 5/16 : ARG CACHING_PROXY=""
+ ---> Using cache
+ ---> 9eb085e122b1
+Step 6/16 : ENV DEBIAN_FRONTEND "noninteractive" LANG "C.UTF-8" LC_ALL "C.UTF-8" CACHING_PROXY ""
+ ---> Using cache
+ ---> 240cab59e5d3
+Step 7/16 : RUN adduser --disabled-password --home /home/livebuilder --shell /bin/bash --disabled-password --gecos "livebuilder" livebuilder
+ ---> Using cache
+ ---> 12e445ecb097
+Step 8/16 : RUN adduser livebuilder sudo
+ ---> Using cache
+ ---> 17183310473d
+Step 9/16 : RUN sed -i 's|packages|us.mirror|' /etc/apt/sources.list && mkdir -p /etc/apt/preferences.d
+ ---> Using cache
+ ---> 2233ba7597a3
+Step 10/16 : RUN echo "deb http://us.mirror.devuan.org/devuan ascii main" | tee -a /etc/apt/sources.list
+ ---> Using cache
+ ---> 485cd843f63b
+Step 11/16 : RUN apt-get update && apt-get install -yq --fix-missing --reinstall         apt-transport-https apt-utils iproute2 debconf
+ ---> Using cache
+ ---> 96b29aab02ab
+Step 12/16 : RUN echo "Acquire::HTTP::Proxy \"$CACHING_PROXY\";" | tee -a /etc/apt/apt.conf.d/01proxy
+ ---> Using cache
+ ---> 74b6c0478ea2
+Step 13/16 : RUN apt-get update && apt-get install -yq --fix-missing --reinstall                 gnupg2                 bash                 make                 apt-utils                 live-build                 debootstrap                 make                 curl                 sudo                 procps                 ca-certificates                 devuan-keyring                 debian-keyring                 debian-archive-keyring                 dirmngr                 cpio                 e2fsprogs                 squashfs-tools                 syslinux-common                 less
+ ---> Using cache
+ ---> ec1df4176151
+Step 14/16 : RUN echo 'livebuilder ALL=(ALL) NOPASSWD: ALL' | tee -a /etc/sudoers
+ ---> Using cache
+ ---> 01991ed03df5
+Step 15/16 : RUN chown -R livebuilder:livebuilder /home/livebuilder/
+ ---> Using cache
+ ---> 16a24d9e700e
+Step 16/16 : WORKDIR /home/livebuilder/hoarder-live
+ ---> Using cache
+ ---> f556bd69a857
+Successfully built f556bd69a857
+make[2]: Leaving directory '/home/idk/local-manifest/distro-site-manifest/personalos-static'
+make[2]: Entering directory '/home/idk/local-manifest/distro-site-manifest/personalos-static'
+docker build --force-rm -t eyedeekay/p-devuan \
+	--build-arg "custom"="yes" \
+	--build-arg "proxy_addr"="" \
+	--build-arg "proxy_host"="" \
+	--build-arg "proxy_port"="" \
+	-f Dockerfiles/Dockerfile.devuan .
+Sending build context to Docker daemon 2.062 MB
+Step 1/18 : FROM eyedeekay/build-devuan
+ ---> f556bd69a857
+Step 2/18 : ARG distro="devuan"
+ ---> Using cache
+ ---> 7a3e47823ad4
+Step 3/18 : ARG custom
+ ---> Using cache
+ ---> 6105d36b0206
+Step 4/18 : ARG proxy_addr
+ ---> Using cache
+ ---> de5729e63738
+Step 5/18 : ARG proxy_host
+ ---> Using cache
+ ---> 605fa179d866
+Step 6/18 : ARG proxy_port
+ ---> Using cache
+ ---> cf321f6c7733
+Step 7/18 : ENV distro "devuan"
+ ---> Using cache
+ ---> b90bc058ce2a
+Step 8/18 : COPY Makefile /home/livebuilder/hoarder-live/Makefile
+ ---> Using cache
+ ---> 76d99ee369a8
+Step 9/18 : COPY config.mk /home/livebuilder/hoarder-live/config.mk
+ ---> Using cache
+ ---> 7f50fcf56f99
+Step 10/18 : COPY includes /home/livebuilder/hoarder-live/includes/
+ ---> Using cache
+ ---> 77a1d34130ae
+Step 11/18 : COPY auto /home/livebuilder/hoarder-live/auto/
+ ---> Using cache
+ ---> 4c082c0bc4fc
+Step 12/18 : COPY keyrings/ /home/livebuilder/hoarder-live/keyrings/
+ ---> Using cache
+ ---> ee0177f2402a
+Step 13/18 : RUN chown -R livebuilder:livebuilder /home/livebuilder/hoarder-live
+ ---> Using cache
+ ---> a8e122dd0f2b
+Step 14/18 : WORKDIR /home/livebuilder/hoarder-live/
+ ---> Using cache
+ ---> 5179a47b75fe
+Step 15/18 : RUN make docker-init
+ ---> Using cache
+ ---> d978648f3e22
+Step 16/18 : USER livebuilder
+ ---> Using cache
+ ---> e5fc2d90b952
+Step 17/18 : RUN make config
+ ---> Using cache
+ ---> c12216da9c49
+Step 18/18 : CMD make build
+ ---> Using cache
+ ---> 4b3cd92a5536
+Successfully built 4b3cd92a5536
+make[2]: Leaving directory '/home/idk/local-manifest/distro-site-manifest/personalos-static'

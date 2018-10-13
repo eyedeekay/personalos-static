@@ -33,11 +33,6 @@ docker-rebuild:
 	make docker-setup
 	make docker-build
 
-docker-rebuild-nochroot:
-	git pull; \
-	make docker-setup
-	make docker-build-nochroot
-
 docker-build:
 	docker rm -f $(image_prename)-build-$(distro); true
 	docker run -i \
@@ -61,7 +56,7 @@ docker-release:
 docker-base:
 	docker build --force-rm \
 		--build-arg "CACHING_PROXY"="$(proxy_addr)" \
-		-t eyedeekay/$(image_prename)-build-$(distro) \
+		-t eyedeekay/build-$(distro) \
 		-f Dockerfiles/Dockerfile.live-build.$(distro) .
 
 docker:

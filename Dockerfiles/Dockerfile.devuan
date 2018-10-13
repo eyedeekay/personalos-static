@@ -1,4 +1,4 @@
-FROM eyedeekay/tv-build-devuan
+FROM eyedeekay/build-devuan
 ARG distro="devuan"
 ARG custom
 ARG proxy_addr
